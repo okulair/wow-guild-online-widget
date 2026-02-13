@@ -30,6 +30,16 @@ function GOW:CreateWidget()
   f:SetBackdropColor(0.05, 0.05, 0.08, 0.75)
   f:SetBackdropBorderColor(0.3, 0.45, 0.65, 0.9)
 
+  function f:SetPinnedVisual(isPinned)
+    if isPinned then
+      self:SetBackdropColor(0.05, 0.08, 0.10, 0.92)
+      self:SetBackdropBorderColor(0.35, 0.85, 1.00, 1.00)
+    else
+      self:SetBackdropColor(0.05, 0.05, 0.08, 0.75)
+      self:SetBackdropBorderColor(0.3, 0.45, 0.65, 0.9)
+    end
+  end
+
   local text = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
   f.text = text
   text:SetPoint("CENTER", f, "CENTER", 0, 0)
@@ -87,6 +97,7 @@ function GOW:CreateWidget()
   f:SetScript("OnClick", function(selfBtn, button)
     if button == "LeftButton" and GOW.tooltip then
       GOW.tooltip:TogglePinned(selfBtn)
+      selfBtn:SetPinnedVisual(GOW.tooltip and GOW.tooltip.pinned)
     elseif button == "RightButton" and GOW.ShowWidgetMenu then
       GOW:ShowWidgetMenu()
     end
@@ -96,6 +107,7 @@ function GOW:CreateWidget()
   f:SetScale(self.db.scale or 1)
   f:ApplyMovableState()
   f:UpdateText()
+  f:SetPinnedVisual(GOW.tooltip and GOW.tooltip.pinned)
 
   return f
 end
