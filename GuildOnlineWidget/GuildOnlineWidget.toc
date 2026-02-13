@@ -1,0 +1,13 @@
+## Interface: 120001
+## Title: Guild Online Widget
+## Notes: Shows online guild members (count + tooltip list)
+## Author: Dom
+## Version: 0.1.0
+## SavedVariables: GuildOnlineWidgetDB
+
+init.lua
+util.lua
+ui_widget.lua
+ui_tooltip.lua
+ui_menu.lua
+core.lua

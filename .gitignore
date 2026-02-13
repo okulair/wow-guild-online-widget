@@ -1,0 +1,36 @@
+#
+.ai
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+
+# Logs
+*.log
+
+# Packaging artifacts
+*.zip
+*.rar
+*.7z
+/dist/
+/build/
+/out/
+
+# WoW / addon dev local clutter (if you copy this repo into AddOns)
+WTF/
+Cache/
+*/SavedVariables/
+
+# Lua tooling (if you add it later)
+luarocks/
+*.rock
+
+# Temporary
+.tmp/
+.tmp*
+*~
