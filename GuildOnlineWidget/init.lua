@@ -18,6 +18,7 @@ GOW.defaults = {
   version = 1,
   locked = false,
   scale = 1,
+  alpha = 0.75,
   showTotal = false,
   showMythicPlusScore = false,
   sort = "name", -- name|level|zone

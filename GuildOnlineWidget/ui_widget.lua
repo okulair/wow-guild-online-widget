@@ -15,7 +15,7 @@ function GOW:CreateWidget()
 
   local f = CreateFrame("Button", "GuildOnlineWidgetFrame", UIParent, "BackdropTemplate")
   self.widget = f
-  f:SetSize(132, 24)
+  f:SetSize(116, 28)
   f:SetFrameStrata("MEDIUM")
   f:SetClampedToScreen(true)
   f:RegisterForClicks("LeftButtonUp", "RightButtonUp")
@@ -27,15 +27,16 @@ function GOW:CreateWidget()
     edgeSize = 12,
     insets = { left = 2, right = 2, top = 2, bottom = 2 },
   })
-  f:SetBackdropColor(0.05, 0.05, 0.08, 0.75)
+  f:SetBackdropColor(0.05, 0.05, 0.08, GOW.db.alpha or 0.75)
   f:SetBackdropBorderColor(0.3, 0.45, 0.65, 0.9)
 
   function f:SetPinnedVisual(isPinned)
+    local baseAlpha = GOW.db.alpha or 0.75
     if isPinned then
-      self:SetBackdropColor(0.05, 0.08, 0.10, 0.92)
+      self:SetBackdropColor(0.05, 0.08, 0.10, math.min(1, baseAlpha + 0.17))
       self:SetBackdropBorderColor(0.35, 0.85, 1.00, 1.00)
     else
-      self:SetBackdropColor(0.05, 0.05, 0.08, 0.75)
+      self:SetBackdropColor(0.05, 0.05, 0.08, baseAlpha)
       self:SetBackdropBorderColor(0.3, 0.45, 0.65, 0.9)
     end
   end
@@ -65,11 +66,11 @@ function GOW:CreateWidget()
     if not IsInGuild() then
       label = "No guild"
     elseif s.loading then
-      label = "Loading..."
+      label = "G: ..."
     elseif GOW.db.showTotal then
-      label = ("Online: %d/%d"):format(s.onlineCount or 0, s.totalCount or 0)
+      label = ("G: %d/%d"):format(s.onlineCount or 0, s.totalCount or 0)
     else
-      label = ("Online: %d"):format(s.onlineCount or 0)
+      label = ("G: %d"):format(s.onlineCount or 0)
     end
     self.text:SetText(label)
   end

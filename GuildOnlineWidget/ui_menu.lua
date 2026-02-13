@@ -113,6 +113,22 @@ local function ShowWidgetMenuModern(anchor)
         if GOW.widget then GOW.widget:SetScale(GOW.db.scale) end
       end)
 
+      root:CreateButton("Transparency +", function()
+        GOW.db.alpha = math.min((GOW.db.alpha or 0.75) + 0.05, 1)
+        GOW:PersistDB()
+        if GOW.widget and GOW.widget.SetPinnedVisual then
+          GOW.widget:SetPinnedVisual(GOW.tooltip and GOW.tooltip.pinned)
+        end
+      end)
+
+      root:CreateButton("Transparency -", function()
+        GOW.db.alpha = math.max((GOW.db.alpha or 0.75) - 0.05, 0.2)
+        GOW:PersistDB()
+        if GOW.widget and GOW.widget.SetPinnedVisual then
+          GOW.widget:SetPinnedVisual(GOW.tooltip and GOW.tooltip.pinned)
+        end
+      end)
+
       root:CreateButton("Reset Position", function()
         GOW.db.point, GOW.db.relPoint, GOW.db.x, GOW.db.y = "CENTER", "CENTER", 0, 0
         GOW:PersistDB()
@@ -194,6 +210,8 @@ function GOW:ShowWidgetMenu()
     },
     { text = "Scale +", notCheckable = true, func = function() self.db.scale = math.min((self.db.scale or 1) + 0.05, 2); self:PersistDB(); self.widget:SetScale(self.db.scale) end },
     { text = "Scale -", notCheckable = true, func = function() self.db.scale = math.max((self.db.scale or 1) - 0.05, 0.6); self:PersistDB(); self.widget:SetScale(self.db.scale) end },
+    { text = "Transparency +", notCheckable = true, func = function() self.db.alpha = math.min((self.db.alpha or 0.75) + 0.05, 1); self:PersistDB(); if self.widget and self.widget.SetPinnedVisual then self.widget:SetPinnedVisual(self.tooltip and self.tooltip.pinned) end end },
+    { text = "Transparency -", notCheckable = true, func = function() self.db.alpha = math.max((self.db.alpha or 0.75) - 0.05, 0.2); self:PersistDB(); if self.widget and self.widget.SetPinnedVisual then self.widget:SetPinnedVisual(self.tooltip and self.tooltip.pinned) end end },
     { text = "Reset Position", notCheckable = true, func = function() self.db.point, self.db.relPoint, self.db.x, self.db.y = "CENTER", "CENTER", 0, 0; self:PersistDB(); if self.widget then self.widget:RestorePosition() end end },
     { text = "Refresh Roster", notCheckable = true, func = function() self.core:RequestRoster(true) end },
   }
