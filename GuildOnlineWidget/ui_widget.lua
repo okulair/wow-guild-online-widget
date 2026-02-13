@@ -15,7 +15,7 @@ function GOW:CreateWidget()
 
   local f = CreateFrame("Button", "GuildOnlineWidgetFrame", UIParent, "BackdropTemplate")
   self.widget = f
-  f:SetSize(116, 28)
+  f:SetSize(92, 28)
   f:SetFrameStrata("MEDIUM")
   f:SetClampedToScreen(true)
   f:RegisterForClicks("LeftButtonUp", "RightButtonUp")
