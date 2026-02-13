@@ -55,7 +55,12 @@ function Core:RequestRoster(force)
   self.lastGuildRosterRequest = now
 
   GOW.state.loading = true
-  RequestGuildRoster()
+  local ok = RequestGuildRoster()
+  if not ok then
+    -- If we can't request, don't leave the UI stuck in loading.
+    GOW.state.loading = false
+    if GOW.widget then GOW.widget:UpdateText() end
+  end
 end
 
 function Core:BuildSnapshot()
@@ -187,20 +192,24 @@ local function HandleSlash(msg)
   local cmd, arg = msg:match("^(%S+)%s*(.-)$")
   if cmd == "lock" then
     GOW.db.locked = true
+    GOW:PersistDB()
     if GOW.widget then GOW.widget:ApplyMovableState() end
     GOW:Print("Widget locked")
   elseif cmd == "unlock" then
     GOW.db.locked = false
+    GOW:PersistDB()
     if GOW.widget then GOW.widget:ApplyMovableState() end
     GOW:Print("Widget unlocked")
   elseif cmd == "reset" then
     GOW.db.point, GOW.db.relPoint, GOW.db.x, GOW.db.y = "CENTER", "CENTER", 0, 0
+    GOW:PersistDB()
     if GOW.widget then GOW.widget:RestorePosition() end
     GOW:Print("Position reset")
   elseif cmd == "scale" then
     local n = tonumber(arg)
     if n and n >= 0.6 and n <= 2 then
       GOW.db.scale = n
+      GOW:PersistDB()
       if GOW.widget then GOW.widget:SetScale(n) end
       GOW:Print(("Scale set to %.2f"):format(n))
     else
@@ -209,6 +218,7 @@ local function HandleSlash(msg)
   elseif cmd == "sort" then
     if arg == "name" or arg == "level" or arg == "zone" then
       GOW.db.sort = arg
+      GOW:PersistDB()
       U.SortMembers(GOW.state.sorted, GOW.db.sort)
       if GOW.tooltip and GOW.tooltip:IsShown() then GOW.tooltip:RefreshRows() end
       GOW:Print("Sort set to " .. arg)
@@ -221,6 +231,10 @@ local function HandleSlash(msg)
 end
 
 function Core:Initialize()
+  if self.initialized then return end
+  self.initialized = true
+
+  -- SavedVariables are guaranteed to be loaded by the time ADDON_LOADED fires.
   GOW:InitDB()
 
   if GOW.CreateWidget then GOW:CreateWidget() end
@@ -242,6 +256,8 @@ function Core:Initialize()
     if event == "PLAYER_LOGIN" then
       self:RequestRoster(true)
       C_Timer.After(1, function() self:RequestRoster(true) end)
+      -- Fallback: roster update events sometimes lag; build snapshot from whatever data we have.
+      C_Timer.After(2, function() self:OnRosterUpdate() end)
       C_Timer.After(2, function() self:ScanMythicPlusScores(true) end)
     elseif event == "PLAYER_GUILD_UPDATE" then
       self:RequestRoster(true)
@@ -253,4 +269,12 @@ function Core:Initialize()
   end)
 end
 
-Core:Initialize()
+-- Defer initialization until SavedVariables are available.
+local loader = CreateFrame("Frame")
+loader:RegisterEvent("ADDON_LOADED")
+loader:SetScript("OnEvent", function(_, _, addonName)
+  if addonName == GOW.name then
+    Core:Initialize()
+    loader:UnregisterEvent("ADDON_LOADED")
+  end
+end)

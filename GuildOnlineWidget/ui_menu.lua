@@ -67,16 +67,19 @@ local function ShowWidgetMenuModern(anchor)
 
       root:CreateButton(GOW.db.locked and "Unlock" or "Lock", function()
         GOW.db.locked = not GOW.db.locked
+        GOW:PersistDB()
         if GOW.widget then GOW.widget:ApplyMovableState() end
       end)
 
       root:CreateButton(GOW.db.showTotal and "Hide Total" or "Show Total", function()
         GOW.db.showTotal = not GOW.db.showTotal
+        GOW:PersistDB()
         if GOW.widget then GOW.widget:UpdateText() end
       end)
 
       root:CreateButton(GOW.db.showMythicPlusScore and "Hide Mythic+ Score" or "Show Mythic+ Score", function()
         GOW.db.showMythicPlusScore = not GOW.db.showMythicPlusScore
+        GOW:PersistDB()
         if GOW.db.showMythicPlusScore and GOW.core and GOW.core.ScanMythicPlusScores then
           GOW.core:ScanMythicPlusScores(true)
         end
@@ -89,6 +92,7 @@ local function ShowWidgetMenuModern(anchor)
 
       local function SetSortSelected(sortValue)
         GOW.db.sort = sortValue
+        GOW:PersistDB()
         GOW.core:OnRosterUpdate()
       end
 
@@ -99,16 +103,19 @@ local function ShowWidgetMenuModern(anchor)
 
       root:CreateButton("Scale +", function()
         GOW.db.scale = math.min((GOW.db.scale or 1) + 0.05, 2)
+        GOW:PersistDB()
         if GOW.widget then GOW.widget:SetScale(GOW.db.scale) end
       end)
 
       root:CreateButton("Scale -", function()
         GOW.db.scale = math.max((GOW.db.scale or 1) - 0.05, 0.6)
+        GOW:PersistDB()
         if GOW.widget then GOW.widget:SetScale(GOW.db.scale) end
       end)
 
       root:CreateButton("Reset Position", function()
         GOW.db.point, GOW.db.relPoint, GOW.db.x, GOW.db.y = "CENTER", "CENTER", 0, 0
+        GOW:PersistDB()
         if GOW.widget then GOW.widget:RestorePosition() end
       end)
 
@@ -150,6 +157,7 @@ function GOW:ShowWidgetMenu()
       notCheckable = true,
       func = function()
         self.db.locked = not self.db.locked
+        self:PersistDB()
         if self.widget then self.widget:ApplyMovableState() end
       end,
     },
@@ -158,6 +166,7 @@ function GOW:ShowWidgetMenu()
       notCheckable = true,
       func = function()
         self.db.showTotal = not self.db.showTotal
+        self:PersistDB()
         if self.widget then self.widget:UpdateText() end
       end,
     },
@@ -166,6 +175,7 @@ function GOW:ShowWidgetMenu()
       notCheckable = true,
       func = function()
         self.db.showMythicPlusScore = not self.db.showMythicPlusScore
+        self:PersistDB()
         if self.db.showMythicPlusScore and self.core and self.core.ScanMythicPlusScores then
           self.core:ScanMythicPlusScores(true)
         end
@@ -177,14 +187,14 @@ function GOW:ShowWidgetMenu()
       notCheckable = true,
       hasArrow = true,
       menuList = {
-        { text = "Name", checked = self.db.sort == "name", isNotRadio = false, keepShownOnClick = false, func = function() self.db.sort = "name"; self.core:OnRosterUpdate() end },
-        { text = "Level", checked = self.db.sort == "level", isNotRadio = false, keepShownOnClick = false, func = function() self.db.sort = "level"; self.core:OnRosterUpdate() end },
-        { text = "Zone", checked = self.db.sort == "zone", isNotRadio = false, keepShownOnClick = false, func = function() self.db.sort = "zone"; self.core:OnRosterUpdate() end },
+        { text = "Name", checked = self.db.sort == "name", isNotRadio = false, keepShownOnClick = false, func = function() self.db.sort = "name"; self:PersistDB(); self.core:OnRosterUpdate() end },
+        { text = "Level", checked = self.db.sort == "level", isNotRadio = false, keepShownOnClick = false, func = function() self.db.sort = "level"; self:PersistDB(); self.core:OnRosterUpdate() end },
+        { text = "Zone", checked = self.db.sort == "zone", isNotRadio = false, keepShownOnClick = false, func = function() self.db.sort = "zone"; self:PersistDB(); self.core:OnRosterUpdate() end },
       },
     },
-    { text = "Scale +", notCheckable = true, func = function() self.db.scale = math.min((self.db.scale or 1) + 0.05, 2); self.widget:SetScale(self.db.scale) end },
-    { text = "Scale -", notCheckable = true, func = function() self.db.scale = math.max((self.db.scale or 1) - 0.05, 0.6); self.widget:SetScale(self.db.scale) end },
-    { text = "Reset Position", notCheckable = true, func = function() self.db.point, self.db.relPoint, self.db.x, self.db.y = "CENTER", "CENTER", 0, 0; if self.widget then self.widget:RestorePosition() end end },
+    { text = "Scale +", notCheckable = true, func = function() self.db.scale = math.min((self.db.scale or 1) + 0.05, 2); self:PersistDB(); self.widget:SetScale(self.db.scale) end },
+    { text = "Scale -", notCheckable = true, func = function() self.db.scale = math.max((self.db.scale or 1) - 0.05, 0.6); self:PersistDB(); self.widget:SetScale(self.db.scale) end },
+    { text = "Reset Position", notCheckable = true, func = function() self.db.point, self.db.relPoint, self.db.x, self.db.y = "CENTER", "CENTER", 0, 0; self:PersistDB(); if self.widget then self.widget:RestorePosition() end end },
     { text = "Refresh Roster", notCheckable = true, func = function() self.core:RequestRoster(true) end },
   }
 

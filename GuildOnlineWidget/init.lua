@@ -47,3 +47,10 @@ function GOW:InitDB()
   GuildOnlineWidgetDB = CopyDefaults(GuildOnlineWidgetDB, self.defaults)
   self.db = GuildOnlineWidgetDB
 end
+
+-- Explicitly re-assign the global SavedVariables reference. This is normally
+-- unnecessary (tables are by reference), but it helps avoid edge cases where a
+-- consumer accidentally swaps GOW.db.
+function GOW:PersistDB()
+  GuildOnlineWidgetDB = self.db
+end
