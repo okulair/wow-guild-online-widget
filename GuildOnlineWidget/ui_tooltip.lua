@@ -15,6 +15,11 @@ local COL_ZONE_NO_SCORE_X = 132
 local TOOLTIP_WIDTH_EMPTY = 272
 local TOOLTIP_WIDTH_NO_SCORE = 316
 local TOOLTIP_WIDTH_WITH_SCORE = 364
+local TOOLTIP_WIDTH_NOTE_NO_SCORE = 420
+local TOOLTIP_WIDTH_NOTE_WITH_SCORE = 468
+
+local NOTE_MAX_CHARS = 16
+local NOTE_PX_PER_CHAR = 5.8
 
 local ZONE_CHAR_MIN = 24
 local ZONE_CHAR_MAX = 52
@@ -76,8 +81,11 @@ function GOW:CreateTooltip()
 
     row.zoneFS = row:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     row.zoneFS:SetPoint("LEFT", row, "LEFT", COL_ZONE_WITH_SCORE_X, 0)
-    row.zoneFS:SetPoint("RIGHT", row, "RIGHT", -4, 0)
     row.zoneFS:SetJustifyH("LEFT")
+
+    row.noteFS = row:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    row.noteFS:SetPoint("RIGHT", row, "RIGHT", -4, 0)
+    row.noteFS:SetJustifyH("RIGHT")
 
     row:SetScript("OnClick", function(selfRow, button)
       if not selfRow.member then return end
@@ -191,7 +199,23 @@ function GOW:CreateTooltip()
     local shown = 0
     local total = math.min(#list, MAX_ROWS)
     local showMPlus = GOW.db and GOW.db.showMythicPlusScore
-    local tooltipWidth = showMPlus and TOOLTIP_WIDTH_WITH_SCORE or TOOLTIP_WIDTH_NO_SCORE
+
+    -- Determine if any online member has a guild note
+    local hasAnyNote = false
+    for i = 1, total do
+      local m = list[i]
+      if m.note and m.note ~= "" then
+        hasAnyNote = true
+        break
+      end
+    end
+
+    local tooltipWidth
+    if hasAnyNote then
+      tooltipWidth = showMPlus and TOOLTIP_WIDTH_NOTE_WITH_SCORE or TOOLTIP_WIDTH_NOTE_NO_SCORE
+    else
+      tooltipWidth = showMPlus and TOOLTIP_WIDTH_WITH_SCORE or TOOLTIP_WIDTH_NO_SCORE
+    end
     self:SetWidth(tooltipWidth)
 
     for i = 1, total do
@@ -204,7 +228,6 @@ function GOW:CreateTooltip()
       row.levelFS:SetText(m.level and tostring(m.level) or "--")
 
       row.zoneFS:ClearAllPoints()
-      row.zoneFS:SetPoint("RIGHT", row, "RIGHT", -4, 0)
 
       local zoneLeftX = COL_ZONE_NO_SCORE_X
       if showMPlus and GOW.core and GOW.core.GetMemberMythicPlusScore then
@@ -221,7 +244,22 @@ function GOW:CreateTooltip()
         row.scoreFS:Hide()
       end
 
-      row.zoneFS:SetPoint("LEFT", row, "LEFT", zoneLeftX, 0)
+      -- Note column
+      local noteText = U.Truncate(m.note or "", NOTE_MAX_CHARS)
+      if hasAnyNote then
+        row.noteFS:SetText(noteText)
+        row.noteFS:Show()
+        -- Zone anchors: left edge to right edge before note
+        row.zoneFS:SetPoint("LEFT", row, "LEFT", zoneLeftX, 0)
+        row.zoneFS:SetPoint("RIGHT", row.noteFS, "LEFT", -4, 0)
+      else
+        row.noteFS:SetText("")
+        row.noteFS:Hide()
+        -- Zone anchors: left edge to right edge of row
+        row.zoneFS:SetPoint("LEFT", row, "LEFT", zoneLeftX, 0)
+        row.zoneFS:SetPoint("RIGHT", row, "RIGHT", -4, 0)
+      end
+
       local zoneMaxChars = self:GetZoneMaxChars(row, zoneLeftX)
       row.zoneFS:SetText(U.Truncate((m.isMobile and "Mobile") or m.zone or "", zoneMaxChars))
       row:Show()

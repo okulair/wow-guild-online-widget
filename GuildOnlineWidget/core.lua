@@ -85,7 +85,7 @@ function Core:BuildSnapshot()
     -- name, rank, rankIndex, level, class, zone, note, officerNote,
     -- isOnline, status, classFileName, achievementPoints, achievementRank,
     -- isMobile, canSoR, reputation, guid
-    local name, _, _, level, _, zone, _, _, isOnline, status, classFileName, _, _, isMobile, _, _, guid = GetGuildRosterInfo(i)
+    local name, _, _, level, _, zone, note, _, isOnline, status, classFileName, _, _, isMobile, _, _, guid = GetGuildRosterInfo(i)
     if isOnline then
       local fullName = name or "Unknown"
       local key = U.GetNameKey(fullName, guid)
@@ -93,6 +93,7 @@ function Core:BuildSnapshot()
         name = fullName,
         level = tonumber(level) or 0,
         zone = zone or "",
+        note = note or "",
         classFile = classFileName,
         isMobile = isMobile and true or false,
         status = status,
